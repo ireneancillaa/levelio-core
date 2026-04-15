@@ -3,12 +3,17 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
+// routes
+const accountRoutes = require("../features/account");
+
+// prefix
+app.use("/account", accountRoutes);
+
 app.get("/", (req, res) => {
-  res.json({ status: "online", message: "levelio API is running" });
+  res.json({ status: "online", message: "levelio API is online" });
 });
 
 if (process.env.NODE_ENV !== "production") {
