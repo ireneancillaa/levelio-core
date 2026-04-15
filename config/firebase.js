@@ -7,3 +7,8 @@ admin.initializeApp({
     privateKey: process.env.FB_PRIVATE_KEY.replace(/\\n/g, "\n"),
   }),
 });
+
+const auth = admin.auth();
+const db = admin.firestore();
+
+module.exports = { auth, db, admin };
