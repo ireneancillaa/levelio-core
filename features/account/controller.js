@@ -50,5 +50,46 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  res.json({ message: "account login" });
+  console.log("starting login user");
+
+  try {
+    const token = req.headers.authorization;
+    console.log(`received token: ${token}`);
+
+    if (!token) {
+      return res.status(401).json({
+        status: "unauthorized",
+        message: "No token found",
+      });
+    }
+
+    console.log("awaiting verify token");
+
+    const decodedToken = await auth.verifyIdToken(token);
+    const uid = decodedToken.uid;
+
+    console.log("getting user data from doc");
+
+    const userDoc = await db.collection("users").doc(uid).get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        status: "failed",
+        message: "Doc not found",
+      });
+    }
+
+    res.json({
+      status: "success",
+      data: userDoc.data(),
+    });
+
+    console.log("finished getting user data");
+  } catch (error) {
+    res.status(401).json({
+      status: "error",
+      message: "Invalid token",
+      error: error.message,
+    });
+  }
 };
