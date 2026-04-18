@@ -93,3 +93,37 @@ exports.login = async (req, res) => {
     });
   }
 };
+
+exports.getProfile = async (req, res) => {
+  console.log("starting getting user");
+
+  const { uid } = req.body;
+
+  console.log(`received id: ${uid}`);
+
+  try {
+    console.log("getting user data from doc");
+
+    const userDoc = await db.collection("users").doc(uid).get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        status: "failed",
+        message: "Doc not found",
+      });
+    }
+
+    res.json({
+      status: "success",
+      data: userDoc.data(),
+    });
+
+    console.log("finished getting user data");
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: "Error getting user data",
+      error: error.message,
+    });
+  }
+};
