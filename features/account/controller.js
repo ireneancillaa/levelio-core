@@ -15,7 +15,16 @@ exports.register = async (req, res) => {
       password: password,
     });
 
-    const supabaseUserId = data.user.id
+    if (error) {
+      console.warn("[WARN] register failed:", error.message);
+      return res.status(401).json({
+        status: "error",
+        message: "Register failed",
+        error: error.message,
+      });
+    }
+
+    const supabaseUserId = data.user.id;
 
     console.info("[INFO] generating levelio id...");
 
@@ -52,59 +61,50 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  console.log("starting login user");
+  console.info("[INFO] starting sign in user...");
+
+  const { email, password } = req.body;
 
   try {
-    const token = req.headers.authorization;
-    console.log(`received token: ${token}`);
-
-    if (!token) {
-      return res.status(401).json({
-        status: "unauthorized",
-        message: "No token found",
-      });
-    }
-
-    console.log("awaiting verify token");
-
-    const decodedToken = await auth.verifyIdToken(token);
-    const uid = decodedToken.uid;
-
-    console.log("getting user data from doc");
-
-    const userDoc = await db.collection("users").doc(uid).get();
-
-    if (!userDoc.exists) {
-      return res.status(404).json({
-        status: "failed",
-        message: "Doc not found",
-      });
-    }
-
-    res.json({
-      status: "success",
-      data: userDoc.data(),
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
     });
 
-    console.log("finished getting user data");
+    if (error) {
+      console.warn("[WARN] sign in failed:", error.message);
+      return res.status(401).json({
+        status: "error",
+        message: "Sign in failed",
+        error: error.message,
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "User sign in successfully",
+      data: data,
+    });
+
+    console.info("[INFO] sign in user finished...");
   } catch (error) {
-    res.status(401).json({
+    res.status(400).json({
       status: "error",
-      message: "Invalid token",
+      message: "Sign in failed",
       error: error.message,
     });
   }
 };
 
 exports.getProfile = async (req, res) => {
-  console.log("starting getting user");
+  console.info("[INFO] starting getting user...");
 
   const { uid } = req.body;
 
-  console.log(`received id: ${uid}`);
+  console.info(`[INFO] received id: ${uid}`);
 
   try {
-    console.log("getting user data from doc");
+    console.info("[INFO] getting user data from doc...");
 
     const userDoc = await db.collection("users").doc(uid).get();
 
@@ -120,7 +120,7 @@ exports.getProfile = async (req, res) => {
       data: userDoc.data(),
     });
 
-    console.log("finished getting user data");
+    console.info("[INFO] finished getting user data...");
   } catch (error) {
     res.status(400).json({
       status: "error",
