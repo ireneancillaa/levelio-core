@@ -1,28 +1,30 @@
 const { auth, db } = require("../../config/firebase");
 const { generateLevelioId } = require("../../utils/generateLevelioId");
+const supabase = require("../../config/supabase");
 
 exports.register = async (req, res) => {
-  console.log("starting registering user");
+  console.info("[INFO] starting registering user...");
 
   try {
     const { email, password, name } = req.body;
 
-    console.log("awaiting register user to firebase auth");
+    console.info("[INFO] awaiting register user to supabase auth...");
 
-    const userRecord = await auth.createUser({
-      email,
-      password,
-      displayName: name,
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
     });
 
-    console.log("generating levelio id");
+    const supabaseUserId = data.user.id
+
+    console.info("[INFO] generating levelio id...");
 
     const levelioId = generateLevelioId();
 
-    console.log("awaiting insert user data to firestore");
+    console.info("[INFO] awaiting insert user data to firestore...");
 
-    await db.collection("users").doc(userRecord.uid).set({
-      account_id: userRecord.uid,
+    await db.collection("users").doc(supabaseUserId).set({
+      account_id: supabaseUserId,
       levelio_id: levelioId,
       name,
       email,
@@ -33,14 +35,14 @@ exports.register = async (req, res) => {
       status: "success",
       message: "User registered successfully",
       data: {
-        account_id: userRecord.uid,
+        account_id: supabaseUserId,
         levelio_id: levelioId,
-        name: userRecord.displayName,
-        email: userRecord.email,
+        name: name,
+        email: email,
       },
     });
 
-    console.log("registering user finished");
+    console.info("[INFO] registering user finished...");
   } catch (error) {
     res.status(400).json({
       status: "error",
