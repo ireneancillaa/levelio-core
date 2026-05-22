@@ -8,9 +8,11 @@ app.use(express.json());
 
 // routes
 const accountRoutes = require("../features/account");
+const habitRoutes = require("../features/habit");
 
 // prefix
 app.use("/account", accountRoutes);
+app.use("/habit", habitRoutes);
 
 app.get("/", (req, res) => {
   res.json({ status: "online", message: "levelio API is online" });

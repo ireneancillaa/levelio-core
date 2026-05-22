@@ -1,4 +1,4 @@
-const { auth, db } = require("../../config/firebase");
+const { db } = require("../../config/firebase");
 const { generateLevelioId } = require("../../utils/generateLevelioId");
 const supabase = require("../../config/supabase");
 
@@ -33,7 +33,7 @@ exports.register = async (req, res) => {
     console.info("[INFO] awaiting insert user data to firestore...");
 
     await db.collection("users").doc(supabaseUserId).set({
-      account_id: supabaseUserId,
+      supabase_id: supabaseUserId,
       levelio_id: levelioId,
       name,
       email,
