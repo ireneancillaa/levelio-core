@@ -5,7 +5,7 @@ const { requireAuth } = require("../../middlewares/authMiddleware");
 
 router.post("/register", controller.register);
 router.post("/login", controller.login);
-router.get("/profile", controller.getProfile);
+router.post("/profile", controller.getProfile);
 router.post("/send-email-reset-password", controller.sendEmailResetPassword);
 router.post("/verify-otp", controller.verifyOtp);
 

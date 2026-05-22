@@ -37,18 +37,21 @@ exports.register = async (req, res) => {
       levelio_id: levelioId,
       name,
       email,
-      createdAt: new Date().toISOString(),
+      user_dob: new Date().toISOString(),
+      join_date: new Date().toISOString(),
+      gender: "Prefer not to say",
+      avatar_url: "www.example.com",
+      current_streak: 0,
+      best_streak: 0,
+      today_xp: 0,
     });
+
+    const userDoc = await db.collection("users").doc(supabaseUserId).get();
 
     res.status(201).json({
       status: "success",
       message: "User registered successfully",
-      data: {
-        account_id: supabaseUserId,
-        levelio_id: levelioId,
-        name: name,
-        email: email,
-      },
+      data: { supabaseData: data, firebaseData: userDoc.data() },
     });
 
     console.info("[INFO] registering user finished...");
@@ -80,10 +83,14 @@ exports.login = async (req, res) => {
       });
     }
 
+    const supabaseUserId = data.user.id;
+
+    const userDoc = await db.collection("users").doc(supabaseUserId).get();
+
     res.status(200).json({
       status: "success",
       message: "User sign in successfully",
-      data: data,
+      data: { supabaseData: data, firebaseData: userDoc.data() },
     });
 
     console.info("[INFO] sign in user finished...");
@@ -200,7 +207,7 @@ exports.verifyOtp = async (req, res) => {
 
 exports.resetPassword = async (req, res) => {
   console.info("[INFO] starting resetting password...");
-  
+
   const { newPassword } = req.body;
 
   try {
