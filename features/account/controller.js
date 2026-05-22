@@ -129,3 +129,105 @@ exports.getProfile = async (req, res) => {
     });
   }
 };
+
+exports.sendEmailResetPassword = async (req, res) => {
+  console.info("[INFO] starting sending email...");
+
+  const { email } = req.body;
+
+  try {
+    console.info("[INFO] sending email...");
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+    if (error) {
+      console.warn("[WARN] sending email failed:", error.message);
+      return res.status(400).json({
+        status: "error",
+        message: "Sending email failed",
+        error: error.message,
+      });
+    }
+
+    console.info("[INFO] finished send email...");
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: "Error send email reset password",
+      error: error.message,
+    });
+  }
+};
+
+exports.verifyOtp = async (req, res) => {
+  console.info("[INFO] starting verify OTP...");
+
+  const { email, otpCode } = req.body;
+
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token: otpCode,
+      type: "recovery",
+    });
+
+    if (error) {
+      console.warn("[WARN] verify OTP failed:", error.message);
+      return res.status(400).json({
+        status: "error",
+        message: "Verify OTP failed",
+        error: error.message,
+      });
+    }
+
+    res.json({
+      status: "success",
+      message: "Verify OTP success",
+      data: {
+        access_token: data.session.access_token,
+      },
+    });
+
+    console.info("[INFO] finished verify OTP...");
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: "Error verify OTP",
+      error: error.message,
+    });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  console.info("[INFO] starting resetting password...");
+  
+  const { newPassword } = req.body;
+
+  try {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      console.warn("[WARN] reset password failed:", error.message);
+      return res.status(400).json({
+        status: "error",
+        message: "Reset password failed",
+        error: error.message,
+      });
+    }
+
+    res.json({
+      status: "success",
+      message: "Reset password success",
+    });
+
+    console.info("[INFO] finished reset password...");
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: "Error reset password",
+      error: error.message,
+    });
+  }
+};
