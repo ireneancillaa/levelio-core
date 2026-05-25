@@ -44,6 +44,7 @@ exports.register = async (req, res) => {
       current_streak: 0,
       best_streak: 0,
       today_xp: 0,
+      subscription: "free",
     });
 
     const userDoc = await db.collection("users").doc(supabaseUserId).get();
