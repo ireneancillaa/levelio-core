@@ -1,5 +1,6 @@
 const { db } = require("../../config/firebase");
-const { generateLevelioId } = require("../../utils/generateLevelioId");
+const generateLevelioId = require("../../utils/generateLevelioId");
+const dateFormatter = require("../../utils/dateFormatter");
 const supabase = require("../../config/supabase");
 
 exports.register = async (req, res) => {
@@ -26,9 +27,10 @@ exports.register = async (req, res) => {
 
     const supabaseUserId = data.user.id;
 
-    console.info("[INFO] generating levelio id...");
+    console.info("[INFO] generating levelio id and formatting date...");
 
     const levelioId = generateLevelioId();
+    const formattedDate = dateFormatter();
 
     console.info("[INFO] awaiting insert user data to firestore...");
 
@@ -38,13 +40,14 @@ exports.register = async (req, res) => {
       name,
       email,
       user_dob: new Date().toISOString(),
-      join_date: new Date().toISOString(),
+      join_date: formattedDate,
       gender: "Prefer not to say",
       avatar_url: "www.example.com",
       current_streak: 0,
       best_streak: 0,
       today_xp: 0,
       subscription: "free",
+      created_at: new Date().toISOString(),
     });
 
     const userDoc = await db.collection("users").doc(supabaseUserId).get();

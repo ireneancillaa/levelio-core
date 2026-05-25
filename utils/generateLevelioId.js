@@ -3,4 +3,4 @@ const generateLevelioId = () => {
   return `LV${randomNumber}`;
 };
 
-module.exports = { generateLevelioId };
+module.exports = generateLevelioId;

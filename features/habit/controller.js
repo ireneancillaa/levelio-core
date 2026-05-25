@@ -21,7 +21,7 @@ exports.newHabit = async (req, res) => {
       habit_frequency: habitFrequency,
       habit_reminder: new Date().toISOString(),
       xp_gain: xpGain,
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     };
 
     console.info("[INFO] waiting creating new habit...");
