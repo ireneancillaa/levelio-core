@@ -1,7 +1,7 @@
 const admin = require("firebase-admin");
 
 const privateKey = process.env.FB_PRIVATE_KEY
-  ? process.env.FB_PRIVATE_KEY.replace(/\\n/g, "\n")
+  ? Buffer.from(process.env.FB_PRIVATE_KEY, "base64").toString("utf8")
   : undefined;
 
 if (!admin.apps.length) {
@@ -12,7 +12,7 @@ if (!admin.apps.length) {
       privateKey: privateKey,
     }),
   });
-  console.info("[INFO] Firebase Admin sukses diinisialisasi");
+  console.info("[INFO] Firebase Admin sukses diinisialisasi via Base64");
 }
 
 const auth = admin.auth();
